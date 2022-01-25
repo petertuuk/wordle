@@ -188,8 +188,12 @@ function sim(;solution=rand(answers),inputGuesses::Vector{String}=["oater"],mode
             result = getResult(solution,guess);
             append!(pastGuesses,[guess])
             if verbose
-                print("   Result is: ")
-                println(result');
+                if sum(result)==10
+                    println("   You win!")
+                else
+                    print("   Result is: ")
+                    println(result');
+                end
             end
             if sum(result)==10
                 break
