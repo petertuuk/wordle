@@ -1,4 +1,4 @@
-include("wordle-list.jl"); # words, answers
+include("list-wordle.jl"); # words, answers
 answers = answers[sortperm(rand(length(answers)))];
 words = union(words,answers)
 
@@ -128,6 +128,7 @@ function chooseAGuess(remainingAnswers::Vector{String},mode="all",pastGuesses::V
         wordList = words
         println("bad mode specifier; should be {\"all\",\"answers\",\"remaining\"}; using \"all\"")
     end
+    wordList = cat(remainingAnswers,wordList,dims=1)
 
 
     lenVec = [numLet(w) for w in wordList]
@@ -220,6 +221,86 @@ function sim(;solution=rand(answers),inputGuesses::Vector{String}=["oater"],mode
             end
         end
         return(sum(result)==10,numGuess)
+    end
+end
+
+function parseResultString(resultString)
+    result = fill(0,5)
+    ix = 1
+    for character in resultString
+        if character == '0'
+            result[ix] = 0
+            ix += 1
+        elseif character == '1'
+            result[ix] = 1
+            ix += 1
+        elseif character == '2'
+            result[ix] = 2
+            ix += 1
+        end
+    end
+    if ix != 6
+        println("Bad Result String!")
+    end
+    return result
+end
+
+function assist(mode="answers")
+    let remainingAnswers,pastGuesses=Vector{String}(),grays,yellows,greens,result,numGuess=0
+
+        for i = 1:6
+
+            println("/ / / Guess $i / / /")
+            if i == 1
+                bestGuess = "oater"
+            else
+                bestGuess,_ = chooseAGuess(remainingAnswers,mode,pastGuesses);
+            end
+            println("Suggested guess is: $(uppercase(bestGuess))")
+
+
+            guess = ""
+            while true
+                println("Input your guess:")
+                guess = readline()
+                guess = lowercase(guess)
+                if guess in words
+                    break
+                else
+                    println("Guess not in word list")
+                end
+            end
+            append!(pastGuesses,[guess])
+
+            println("Input the result (gray=0, yellow=1, green=2):")
+            resultString = readline()
+            result = parseResultString(resultString)
+            if sum(result)==10
+                println("You won!")
+                break
+            end
+
+            if i == 1
+                grays,yellows,greens = getConstraints(guess,result);
+            else
+                getConstraints!(guess,result,grays,yellows,greens);
+            end
+
+            remainingAnswers = filterWords(grays,yellows,greens,pastGuesses);
+            if length(remainingAnswers)==1
+                print("1 answer remains")
+            else
+                print("$(length(remainingAnswers)) answers remain");
+            end
+            if length(remainingAnswers)<20
+                print(": ")
+                for a in remainingAnswers
+                    print("$(uppercase(a)) ")
+                end
+            end
+            println("\n")
+
+        end
     end
 end
 
