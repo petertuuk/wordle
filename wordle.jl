@@ -178,7 +178,8 @@ function sim(;solution=rand(answers),inputGuesses::Vector{String}=["oater"],mode
             end
             numGuess += 1
             if verbose
-                print("$i. Guessing $(uppercase(guess))");
+                println("/// Guess $i ///")
+                print("Guessing $(uppercase(guess))");
                 if (i > 1) && (i > length(inputGuesses))
                     println(" ($numBins bins)")
                 else
@@ -189,9 +190,9 @@ function sim(;solution=rand(answers),inputGuesses::Vector{String}=["oater"],mode
             append!(pastGuesses,[guess])
             if verbose
                 if sum(result)==10
-                    println("   You win!")
+                    println("You win!")
                 else
-                    print("   Result is: ")
+                    print("Result is: ")
                     println(result');
                 end
             end
@@ -210,9 +211,9 @@ function sim(;solution=rand(answers),inputGuesses::Vector{String}=["oater"],mode
                     println("something is wrong -- solution not in remainingAnswers")
                 end 
                 if length(remainingAnswers)==1
-                    print("   1 answer remains")
+                    print("1 answer remains")
                 else
-                    print("   $(length(remainingAnswers)) answers remain");
+                    print("$(length(remainingAnswers)) answers remain");
                 end
                 if length(remainingAnswers)<20
                     print(": ")
@@ -254,7 +255,7 @@ function assist(mode="answers")
 
         for i = 1:6
 
-            println("/ / / Guess $i / / /")
+            println("/// Guess $i ///")
             if i == 1
                 bestGuess = "oater"
             else
@@ -280,7 +281,7 @@ function assist(mode="answers")
             resultString = readline()
             result = parseResultString(resultString)
             if sum(result)==10
-                println("You won!")
+                println("You win!")
                 break
             end
 
