@@ -1,6 +1,8 @@
-# Wordle Solver
+# Wordle Tools
+Tools for solving and analyzing [Wordle](https://www.powerlanguage.co.uk/wordle/).
 
 ## Introduction
+
 ### Install
 To get started load the code:
 ```
@@ -8,7 +10,7 @@ julia> include("wordle.jl")
 ```
 
 ### Modes
-There are three basic functions: simulate, test, and assist (shown below). Each of these has three modes:
+There are three basic functions: simulate, test, and assist (described below). Each of these has three modes:
 1. `"all"`: uses all words in the wordlist to choose a guess. This has the best performance but is somewhat slower and may chose obscure words.
 2. `"answers"`: uses words in the answer list to choose a guess.
 3. `"remaining"`: uses remaining valid answers (given the revealed constraints) to choose a guess. This has worse performance but is faster.
