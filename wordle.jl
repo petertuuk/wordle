@@ -340,3 +340,41 @@ function testMode(mode)
 
     return isWinVec,nGuessVec
 end
+
+function play()
+    solution = rand(answers)
+    for i = 1:6
+        println()
+        println("/// Guess $i ///")
+        println("Input your guess:")
+        while true
+            guess = readline()
+            if guess in words
+                break
+            end 
+            println("Guess not in word list. Input a new guess:")
+        end
+        guess = lowercase(guess)
+        result = getResult(solution,guess);
+        # [print("$x") for x in result]
+        for i = 1:length(result)
+            x = result[i]
+            if x == 0
+                c = :light_black
+            elseif x == 1
+                c = :yellow
+            elseif x == 2
+                c = :green
+            end
+            printstyled(uppercase(guess[i]),color=c,bold=true)
+        end
+        println()
+        if sum(result)==10
+            println("You win!")
+            break
+        elseif i==6
+            println("You lose! Solution was $(uppercase(solution))")
+            
+        end
+    end
+end
