@@ -343,6 +343,8 @@ end
 
 function play()
     solution = rand(answers)
+    guessVec = []
+    resultVec = []
     for i = 1:6
         println()
         println("/// Guess $i ///")
@@ -355,20 +357,26 @@ function play()
             println("Guess not in word list. Input a new guess:")
         end
         guess = lowercase(guess)
+        push!(guessVec,guess)
         result = getResult(solution,guess);
+        push!(resultVec,result)
         # [print("$x") for x in result]
-        for i = 1:length(result)
-            x = result[i]
-            if x == 0
-                c = :light_black
-            elseif x == 1
-                c = :yellow
-            elseif x == 2
-                c = :green
+        for j = 1:length(resultVec)
+            r = resultVec[j]
+            g = guessVec[j]
+            for i = 1:length(r)
+                x = r[i]
+                if x == 0
+                    c = :light_black
+                elseif x == 1
+                    c = :yellow
+                elseif x == 2
+                    c = :green
+                end
+                printstyled(uppercase(g[i]),color=c,bold=true)
             end
-            printstyled(uppercase(guess[i]),color=c,bold=true)
+            println()
         end
-        println()
         if sum(result)==10
             println("You win!")
             break
