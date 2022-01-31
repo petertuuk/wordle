@@ -1,3 +1,7 @@
+using DataStructures: DefaultDict
+
+bestFirstGuess = "trace"
+
 include("list-wordle.jl"); # words, answers
 answers = answers[sortperm(rand(length(answers)))];
 words = union(words,answers)
@@ -100,6 +104,33 @@ function getResult(solution,guess)
     return result
 end
 
+function getNumBins(remainingAnswers,word)
+    if true
+        # score based on how many bins the 
+        S = Set{Vector{Int}}()
+        for ir = 1:length(remainingAnswers)
+            push!(S,getResult(remainingAnswers[ir],word))
+        end
+        return length(S)
+    else
+        D = DefaultDict{Vector{Int}, Int}(0)
+        for ir = 1:length(remainingAnswers)
+            result = getResult(remainingAnswers[ir],word)
+            D[result] += 1
+        end
+
+        score = 0.0
+        for k in keys(D)
+            p = D[k]/length(remainingAnswers)
+            score -= p*log10(p)
+        end
+
+        return score
+    end
+    
+end
+
+
 function chooseAGuess(remainingAnswers::Vector{String},mode="all",pastGuesses::Vector{String}=[])
     function numLet(word)
         return length(unique([word[i] for i = 1:length(word)]))
@@ -139,11 +170,7 @@ function chooseAGuess(remainingAnswers::Vector{String},mode="all",pastGuesses::V
 
     numUniqueVec = fill(0,size(wordList))
     for iw = 1:length(wordList)
-        S = Set{Vector{Int}}()
-        for ir = 1:length(remainingAnswers)
-            push!(S,getResult(remainingAnswers[ir],wordList[iw]))
-        end
-        numUniqueVec[iw] = length(S)
+        numUniqueVec[iw] = getNumBins(remainingAnswers,wordList[iw])
         if numUniqueVec[iw] == length(remainingAnswers)
             #we've found a word that can distinguish all remaining answers; no need to keep going
             break
@@ -154,7 +181,7 @@ function chooseAGuess(remainingAnswers::Vector{String},mode="all",pastGuesses::V
 end
 
 
-function sim(;solution=rand(answers),inputGuesses::Vector{String}=["oater"],mode="all",verbose=true)
+function sim(;solution=rand(answers),inputGuesses=[bestFirstGuess],mode="all",verbose=true)
     if !(solution in answers)
         println("bad solution -- choose one in the solution list")
         return (false,6)
@@ -168,23 +195,18 @@ function sim(;solution=rand(answers),inputGuesses::Vector{String}=["oater"],mode
         println()
     end
 
-    let remainingAnswers,pastGuesses=Vector{String}(),grays,yellows,greens,result,numGuess=0
+    let remainingAnswers = answers,pastGuesses=Vector{String}(),grays,yellows,greens,result,numGuess=0
         for i = 1:6
             if i <= length(inputGuesses)
                 guess = inputGuesses[i];
-                numBins = 0;
+                numBins = getNumBins(remainingAnswers,guess)
             else
                 guess,numBins = chooseAGuess(remainingAnswers,mode,pastGuesses);
             end
             numGuess += 1
             if verbose
                 println("/// Guess $i ///")
-                print("Guessing $(uppercase(guess))");
-                if (i > 1) && (i > length(inputGuesses))
-                    println(" ($numBins bins)")
-                else
-                    println()
-                end
+                println("Guessing $(uppercase(guess)) ($numBins bins)");
             end
             result = getResult(solution,guess);
             append!(pastGuesses,[guess])
@@ -257,7 +279,7 @@ function assist(mode="answers")
 
             println("/// Guess $i ///")
             if i == 1
-                bestGuess = "oater"
+                bestGuess = bestFirstGuess
             else
                 bestGuess,_ = chooseAGuess(remainingAnswers,mode,pastGuesses);
             end
@@ -309,7 +331,6 @@ function assist(mode="answers")
     end
 end
 
-import Plots
 using ProgressMeter
 function testMode(mode)
     println("Testing mode = $mode")
@@ -323,10 +344,6 @@ function testMode(mode)
 
     print("Solved $(sum(isWinVec)) of $(length(isWinVec)) cases")
     println(" in an average of $(round(sum(nGuessVec[isWinVec])/sum(isWinVec),digits=2)) guesses")
-
-    Plots.histogram(nGuessVec[isWinVec]);
-    Plots.title!("Distribution of Wins");
-    Plots.gui()
 
     for i = 1:6
         println("$i guess: $(sum(nGuessVec[isWinVec] .== i))")
