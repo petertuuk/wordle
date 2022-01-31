@@ -83,4 +83,4 @@ You win!
 ```
 
 ## Dependencies
-This requires `Plots` and `ProgressMeter`
+Requires `ProgressMeter` and `DataStructures`
