@@ -358,47 +358,68 @@ function testMode(mode)
     return isWinVec,nGuessVec
 end
 
+function colormap(res)
+    if res == 0
+        c = :light_black
+    elseif res == 1
+        c = :yellow
+    elseif res == 2
+        c = :green
+    else
+        c = :white
+    end
+    return c
+end
+
 function play()
+    keyb = ["qwertyuiop","asdfghjkl","zxcvbnm"]
     solution = rand(answers)
     guessVec = []
     resultVec = []
+    guess = ""
+    D = DefaultDict{Char, Int}(-1)
     for i = 1:6
-        println()
-        println("/// Guess $i ///")
+        println("\n\n/// Guess $i ///")
         println("Input your guess:")
         while true
             guess = readline()
+            guess = lowercase(guess)
             if guess in words
                 break
             end 
-            println("Guess not in word list. Input a new guess:")
+            println("   Guess not in word list. Input a new guess:")
         end
-        guess = lowercase(guess)
         push!(guessVec,guess)
         result = getResult(solution,guess);
         push!(resultVec,result)
         # [print("$x") for x in result]
+        for j = 1:5
+            D[guess[j]] = max(D[guess[j]],result[j])
+        end
+        println()
         for j = 1:length(resultVec)
             r = resultVec[j]
             g = guessVec[j]
             for i = 1:length(r)
-                x = r[i]
-                if x == 0
-                    c = :light_black
-                elseif x == 1
-                    c = :yellow
-                elseif x == 2
-                    c = :green
-                end
-                printstyled(uppercase(g[i]),color=c,bold=true)
+                printstyled(uppercase(g[i]),color=colormap(r[i]),bold=true)
+            end
+            println()
+        end
+        println()
+        for j = 1:length(keyb)
+            print(repeat(" ",j-1))
+            row = keyb[j]
+            for letter in row
+                printstyled(uppercase(letter),color=colormap(D[letter]),bold=true)
+                print(" ")
             end
             println()
         end
         if sum(result)==10
-            println("You win!")
+            println("\nYou win!")
             break
         elseif i==6
-            println("You lose! Solution was $(uppercase(solution))")
+            println("\nYou lose! 😔\nSolution was $(uppercase(solution))")
             
         end
     end
