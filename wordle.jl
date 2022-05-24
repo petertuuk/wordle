@@ -364,7 +364,7 @@ function colormap(res)
     elseif res == 1
         c = :yellow
     elseif res == 2
-        c = :green
+        c = :blue
     else
         c = :white
     end
@@ -400,6 +400,7 @@ function play()
         for j = 1:length(resultVec)
             r = resultVec[j]
             g = guessVec[j]
+            print("$j. ")
             for i = 1:length(r)
                 printstyled(uppercase(g[i]),color=colormap(r[i]),bold=true)
             end
@@ -420,7 +421,6 @@ function play()
             break
         elseif i==6
             println("\nYou lose! 😔\nSolution was $(uppercase(solution))")
-            
         end
     end
 end
