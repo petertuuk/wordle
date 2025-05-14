@@ -251,6 +251,32 @@ function sim(;solution=rand(answers),inputGuesses=[bestFirstGuess],mode="all",ve
     end
 end
 
+function validateResultString(resultString)
+    isValid = true
+    if length(resultString) != 5
+        isValid = false
+    end
+    if !all([x in ['0','1','2'] for x in resultString])
+        isValid = false
+    end
+    return isValid
+end
+
+function validateGuess(guess)
+    isValid = true
+    if length(guess) != 5
+        isValid = false;return
+    end
+    letters = 'a':'z'
+    if !all([x in letters for x in guess])
+        isValid = false;return
+    end
+    # if !(guess in words)
+    #     isValid = false;return
+    # end
+    return isValid
+end
+
 function parseResultString(resultString)
     result = fill(0,5)
     ix = 1
@@ -287,20 +313,24 @@ function assist(mode="answers")
 
 
             guess = ""
-            while true
+            println("Input your guess:")
+            guess = readline()
+            while !validateGuess(guess)
+                println("Bad Guess. Input new guess:")
                 println("Input your guess:")
                 guess = readline()
                 guess = lowercase(guess)
-                if guess in words
-                    break
-                else
-                    println("Guess not in word list")
-                end
             end
             append!(pastGuesses,[guess])
 
             println("Input the result (gray=0, yellow=1, green=2):")
             resultString = readline()
+            while !validateResultString(resultString)
+                println("Bad Result String")
+                println("Input the result (gray=0, yellow=1, green=2):")
+                resultString = readline()
+            end
+
             result = parseResultString(resultString)
             if sum(result)==10
                 println("You win!")
